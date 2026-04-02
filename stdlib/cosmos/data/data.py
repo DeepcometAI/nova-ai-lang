@@ -5,7 +5,7 @@ Handles CSV, FITS, Parquet, Arrow formats with Wave (lazy) semantics.
 
 import pandas as pd
 import numpy as np
-from typing import Iterator, List, Callable, Any, Optional
+from typing import Iterator, List, Callable, Any, Optional, Iterable
 import os
 
 # Try to import polars for Arrow support (optional)
@@ -17,8 +17,10 @@ except ImportError:
 
 __all__ = [
     'read_csv', 'read_fits', 'read_parquet', 'read_arrow',
+    'read_hdf5', 'read_netcdf',
     'write_csv', 'write_parquet',
-    'Wave'
+    'Wave',
+    'pipeline', 'filter', 'map', 'collect', 'batch', 'drop_outliers', 'sort_by'
 ]
 
 
@@ -27,29 +29,38 @@ class Wave:
     Lazy sequence of records (pull-based iterator).
     Similar to Rust Iterator or Python generator.
     """
-    def __init__(self, generator: Iterator[Any]):
-        self.generator = generator
+    def __init__(self, generator: Iterator[Any] | Iterable[Any]):
+        # The integration tests expect a Wave to be reusable (you can call
+        # filter/map/collect multiple times). A bare Python generator is
+        # single-use, so we cache materialized values on first use.
+        self._source = generator
+        self._cache: Optional[List[Any]] = None
     
     def __iter__(self):
-        return self.generator
+        return iter(self._materialize())
+
+    def _materialize(self) -> List[Any]:
+        if self._cache is None:
+            self._cache = list(self._source)
+        return self._cache
     
     def filter(self, predicate: Callable[[Any], bool]) -> 'Wave':
         """Filter elements passing predicate."""
-        return Wave(x for x in self.generator if predicate(x))
+        return Wave(x for x in self._materialize() if predicate(x))
     
     def map(self, transform: Callable[[Any], Any]) -> 'Wave':
         """Apply transformation to each element."""
-        return Wave(transform(x) for x in self.generator)
+        return Wave(transform(x) for x in self._materialize())
     
     def collect(self) -> List[Any]:
         """Collect all elements into a list (forces evaluation)."""
-        return list(self.generator)
+        return list(self._materialize())
     
     def batch(self, size: int) -> 'Wave':
         """Batch elements into groups of `size`."""
         def batch_gen():
             batch_list = []
-            for item in self.generator:
+            for item in self._materialize():
                 batch_list.append(item)
                 if len(batch_list) == size:
                     yield batch_list
@@ -57,6 +68,20 @@ class Wave:
             if batch_list:
                 yield batch_list
         return Wave(batch_gen())
+
+    def sort_by(self, key: Callable[[Any], Any], reverse: bool = False) -> "Wave":
+        return Wave(sorted(self._materialize(), key=key, reverse=reverse))
+
+    def drop_outliers(self, field: str, sigma: float = 3.0) -> "Wave":
+        data = self._materialize()
+        vals = np.array([float(x[field]) for x in data], dtype=np.float64)
+        mu = float(np.mean(vals))
+        sd = float(np.std(vals, ddof=0))
+        if sd == 0.0:
+            return Wave(list(data))
+        lo = mu - float(sigma) * sd
+        hi = mu + float(sigma) * sd
+        return Wave([x for x, v in zip(data, vals) if lo <= v <= hi])
 
 
 def read_csv(path: str) -> Wave:
@@ -183,6 +208,57 @@ def read_arrow(path: str) -> Wave:
     return Wave(arrow_generator())
 
 
+def read_hdf5(path: str, dataset: str) -> Wave:
+    """
+    Read an HDF5 dataset into a Wave of records.
+
+    Requires `h5py`. For table-like datasets, each row is returned as a dict.
+    """
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"File not found: {path}")
+    try:
+        import h5py
+    except ImportError as e:
+        raise ImportError("h5py required for HDF5 support: pip install h5py") from e
+
+    def gen():
+        with h5py.File(path, "r") as f:
+            ds = f[dataset]
+            arr = ds[()]
+            # structured array -> dict rows
+            if hasattr(arr, "dtype") and getattr(arr.dtype, "names", None):
+                names = list(arr.dtype.names)
+                for row in arr:
+                    yield {n: row[n].item() if hasattr(row[n], "item") else row[n] for n in names}
+            else:
+                for x in np.asarray(arr):
+                    yield x
+
+    return Wave(gen())
+
+
+def read_netcdf(path: str, variable: str) -> Wave:
+    """
+    Read a NetCDF variable into a Wave of values.
+
+    Requires `netCDF4`.
+    """
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"File not found: {path}")
+    try:
+        import netCDF4  # type: ignore
+    except ImportError as e:
+        raise ImportError("netCDF4 required for NetCDF support: pip install netCDF4") from e
+
+    def gen():
+        with netCDF4.Dataset(path, "r") as ds:  # type: ignore[attr-defined]
+            v = ds.variables[variable][:]
+            for x in np.asarray(v):
+                yield x
+
+    return Wave(gen())
+
+
 def write_csv(data: List[dict], path: str) -> None:
     """
     Write records to CSV file.
@@ -205,6 +281,37 @@ def write_parquet(data: List[dict], path: str) -> None:
     """
     df = pd.DataFrame(data)
     df.to_parquet(path, index=False)
+
+
+def pipeline(data: Wave, steps: List[Callable[[Wave], Wave]]) -> Wave:
+    out = data
+    for step in steps:
+        out = step(out)
+    return out
+
+
+def filter(predicate: Callable[[Any], bool]) -> Callable[[Wave], Wave]:
+    return lambda w: w.filter(predicate)
+
+
+def map(transform: Callable[[Any], Any]) -> Callable[[Wave], Wave]:
+    return lambda w: w.map(transform)
+
+
+def collect() -> Callable[[Wave], List[Any]]:
+    return lambda w: w.collect()
+
+
+def batch(size: int) -> Callable[[Wave], Wave]:
+    return lambda w: w.batch(size)
+
+
+def sort_by(field: str, reverse: bool = False) -> Callable[[Wave], Wave]:
+    return lambda w: w.sort_by(lambda r: r[field], reverse=reverse)
+
+
+def drop_outliers(field: str, sigma: float = 3.0) -> Callable[[Wave], Wave]:
+    return lambda w: w.drop_outliers(field=field, sigma=sigma)
 
 
 def filter_wave(predicate: Callable[[Any], bool], data: Wave) -> Wave:

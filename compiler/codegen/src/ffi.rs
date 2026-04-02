@@ -54,15 +54,44 @@ impl FFICodegen {
         extern_func: &ExternFunction,
     ) -> Result<String, CodegenError> {
         let wrapper_name = format!("{}_wrapper", extern_func.name);
-        let mut wrapper = format!(
-            "define {} @{}() {{\n  call {} @{}(",
-            extern_func.return_type.to_string(),
-            wrapper_name,
-            extern_func.return_type.to_string(),
-            extern_func.name
-        );
-        wrapper.push_str(")\n");
-        wrapper.push_str("  ret void\n}");
+        let ret_ty = extern_func.return_type.to_string();
+
+        // Name wrapper parameters deterministically: %arg0, %arg1, ...
+        let param_list = extern_func
+            .parameters
+            .iter()
+            .enumerate()
+            .map(|(i, ty)| format!("{} %arg{}", ty.to_string(), i))
+            .collect::<Vec<_>>()
+            .join(", ");
+
+        let arg_list = (0..extern_func.parameters.len())
+            .map(|i| format!("%arg{}", i))
+            .collect::<Vec<_>>()
+            .join(", ");
+
+        let mut wrapper = String::new();
+        wrapper.push_str(&format!(
+            "define {} @{}({}) {{\nentry:\n",
+            ret_ty, wrapper_name, param_list
+        ));
+
+        match extern_func.return_type {
+            NovaType::Void => {
+                wrapper.push_str(&format!(
+                    "  call void @{}({})\n  ret void\n",
+                    extern_func.name, arg_list
+                ));
+            }
+            _ => {
+                wrapper.push_str(&format!(
+                    "  %res = call {} @{}({})\n  ret {} %res\n",
+                    ret_ty, extern_func.name, arg_list, ret_ty
+                ));
+            }
+        }
+
+        wrapper.push('}');
         Ok(wrapper)
     }
 }
@@ -95,5 +124,28 @@ mod tests {
     fn ffi_codegen_create() {
         let codegen = FFICodegen::new();
         let _ = codegen;
+    }
+
+    #[test]
+    fn ffi_codegen_wrapper_non_void() {
+        let codegen = FFICodegen::new();
+        let mut f = ExternFunction::new("sin".to_string(), NovaType::Float);
+        f.add_parameter(NovaType::Float);
+        let wrapper = codegen.generate_wrapper(&f).expect("wrapper");
+        assert!(wrapper.contains("define f64 @sin_wrapper"));
+        assert!(wrapper.contains("entry:"));
+        assert!(wrapper.contains("call f64 @sin"));
+        assert!(wrapper.contains("ret f64 %res"));
+    }
+
+    #[test]
+    fn ffi_codegen_wrapper_void() {
+        let codegen = FFICodegen::new();
+        let mut f = ExternFunction::new("do_work".to_string(), NovaType::Void);
+        f.add_parameter(NovaType::Int);
+        let wrapper = codegen.generate_wrapper(&f).expect("wrapper");
+        assert!(wrapper.contains("define void @do_work_wrapper"));
+        assert!(wrapper.contains("call void @do_work"));
+        assert!(wrapper.contains("ret void"));
     }
 }

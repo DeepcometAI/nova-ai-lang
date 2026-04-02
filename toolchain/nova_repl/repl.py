@@ -38,6 +38,7 @@ NOVA REPL commands:
   :absorb <module>.{a,b}     Import specific names
                             Example: :absorb cosmos.stats.{ pearson, linear_fit }
   :parse                     Parse tiny NOVA subset (reads multi-line until a blank line)
+  :cparse                    Parse using the *C parser* via FFI (requires built DLL; reads multi-line until blank line)
   :type <expr>               Evaluate expr and show Python type
   :doc <name>                Show docstring (if available)
 
@@ -152,6 +153,16 @@ class NovaConsole:
         ast = parse_tiny(src)
         print(json.dumps(ast, indent=2, ensure_ascii=False))
 
+    def do_cparse(self, src: str) -> None:
+        from .c_parser_ffi import parse_dump
+
+        status, dump, errors = parse_dump(src, filename="<repl>")
+        if errors.strip():
+            print(errors.rstrip())
+        print(dump.rstrip())
+        if status != 0 and not errors.strip():
+            print(f"(cparse status={status})")
+
     def handle_command(self, line: str) -> bool:
         """
         Returns True to continue, False to exit.
@@ -187,6 +198,16 @@ class NovaConsole:
                     break
                 lines.append(s)
             self.do_parse("\n".join(lines))
+            return True
+        if raw == ":cparse":
+            print("enter NOVA code; end with a blank line")
+            lines: list[str] = []
+            while True:
+                s = input("... ")
+                if not s.strip():
+                    break
+                lines.append(s)
+            self.do_cparse("\n".join(lines))
             return True
         raise ValueError(f"unknown command: {raw}")
 
