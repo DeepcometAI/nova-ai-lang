@@ -1,0 +1,40 @@
+-- nova.cli — Command-line interface constellation
+-- Argument parsing, help generation, input validation
+
+constellation nova.cli {
+  export mission add_argument(name: Str, type_name: Str, 
+                             short: Str, long: Str, 
+                             required: Bool, help_text: Str) → Void
+  
+  export mission parse_args(argv: Array[Str]) → Result[Str, Str]
+  
+  export mission get_arg(name: Str) → Result[Str, Str]
+  
+  export mission get_arg_int(name: Str) → Result[Int, Str]
+  
+  export mission get_arg_float(name: Str) → Result[Float[1], Str]
+  
+  export mission get_arg_bool(name: Str) → Result[Bool, Str]
+  
+  export mission get_arg_list(name: Str) → Result[Array[Str], Str]
+  
+  export mission has_arg(name: Str) → Bool
+  
+  export mission set_help_text(program_name: Str, help: Str) → Void
+  
+  export mission print_help() → Void
+  
+  export mission print_usage() → Void
+  
+  export mission set_version(version: Str) → Void
+  
+  export mission print_version() → Void
+  
+  export mission input_required(prompt: Str) → Str
+  
+  export mission input_optional(prompt: Str, default: Str) → Str
+  
+  export mission confirm(prompt: Str) → Bool
+  
+  export mission progress_bar(total: Int) → mission(Int) → Void
+}

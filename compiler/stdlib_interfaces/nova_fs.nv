@@ -1,0 +1,36 @@
+-- nova.fs — File system operations constellation
+-- Core I/O, path manipulation, directory traversal
+
+constellation nova.fs {
+  export mission read_file(path: Str) → Str
+  
+  export mission write_file(path: Str, content: Str) → Void
+  
+  export mission append_file(path: Str, content: Str) → Void
+  
+  export mission file_exists(path: Str) → Bool
+  
+  export mission delete_file(path: Str) → Result[Void, Str]
+  
+  export mission list_dir(path: Str) → Array[Str]
+  
+  export mission mkdir(path: Str) → Result[Void, Str]
+  
+  export mission mkdir_recursive(path: Str) → Result[Void, Str]
+  
+  export mission is_file(path: Str) → Bool
+  
+  export mission is_dir(path: Str) → Bool
+  
+  export mission get_size(path: Str) → Int
+  
+  export mission get_modified_time(path: Str) → Float[1]
+  
+  export mission current_dir() → Str
+  
+  export mission change_dir(path: Str) → Result[Void, Str]
+  
+  export mission copy_file(src: Str, dst: Str) → Result[Void, Str]
+  
+  export mission move_file(src: Str, dst: Str) → Result[Void, Str]
+}

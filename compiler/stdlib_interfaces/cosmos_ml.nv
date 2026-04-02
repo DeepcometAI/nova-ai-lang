@@ -1,0 +1,37 @@
+-- cosmos.ml — Machine learning constellation
+-- Neural network layers, optimizers, loss functions
+-- Integrated with autodiff
+
+constellation cosmos.ml {
+  -- Loss functions
+  export mission mse(pred: Tensor[Float[1], _], target: Tensor[Float[1], _]) → Float[1]
+  
+  export mission cross_entropy(logits: Tensor[Float[1], _], labels: Array[Int]) → Float[1]
+  
+  export mission binary_cross_entropy(pred: Tensor[Float[1], _], target: Tensor[Float[1], _]) → Float[1]
+
+  -- Activation functions
+  export mission relu(x: Tensor[Float[1], _]) → Tensor[Float[1], _]
+  
+  export mission sigmoid(x: Tensor[Float[1], _]) → Tensor[Float[1], _]
+  
+  export mission softmax(x: Tensor[Float[1], _]) → Tensor[Float[1], _]
+  
+  export mission tanh(x: Tensor[Float[1], _]) → Tensor[Float[1], _]
+  
+  export mission gelu(x: Tensor[Float[1], _]) → Tensor[Float[1], _]
+
+  -- Optimizer states (for use inside autodiff blocks)
+  export mission adam(learning_rate: Float[1], beta1: Float[1], beta2: Float[1]) → mission(Tensor[Float[1], _]) → Void
+  
+  export mission sgd(learning_rate: Float[1], momentum: Float[1]) → mission(Tensor[Float[1], _]) → Void
+
+  -- Layer utilities
+  export mission linear(in_features: Int, out_features: Int) → Tensor[Float[1], _]
+  
+  export mission conv1d(in_channels: Int, out_channels: Int, kernel_size: Int) → Tensor[Float[1], _]
+  
+  export mission batch_norm(x: Tensor[Float[1], _], eps: Float[1]) → Tensor[Float[1], _]
+  
+  export mission dropout(x: Tensor[Float[1], _], p: Float[1]) → Tensor[Float[1], _]
+}

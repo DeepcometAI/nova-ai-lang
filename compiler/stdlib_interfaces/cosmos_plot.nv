@@ -1,0 +1,34 @@
+-- cosmos.plot — Scientific visualization constellation
+-- Matplotlib backend, SVG/PNG output
+
+constellation cosmos.plot {
+  export mission scatter(x: Array[Float[1]], y: Array[Float[1]], 
+                        title: Str, xlabel: Str, ylabel: Str) → Void
+  
+  export mission histogram(data: Array[Float[1]], bins: Int, 
+                          title: Str, xlabel: Str) → Void
+  
+  export mission plot(x: Array[Float[1]], y: Array[Float[1]], 
+                     title: Str, xlabel: Str, ylabel: Str, 
+                     line_style: Str) → Void
+  
+  export mission regression_line(slope: Float[1], intercept: Float[1],
+                                x_range: (Float[1], Float[1])) → Void
+  
+  export mission hr_diagram(magnitude: Array[Float[1]], color_index: Array[Float[1]],
+                           title: Str) → Void
+  
+  export mission heatmap(data: Tensor[Float[1], _], title: Str) → Void
+  
+  export mission bar_chart(labels: Array[Str], values: Array[Float[1]], 
+                          title: Str, ylabel: Str) → Void
+  
+  export mission legend(labels: Array[Str]) → Void
+  
+  export mission set_xlabel(label: Str) → Void
+  export mission set_ylabel(label: Str) → Void
+  export mission set_title(title: Str) → Void
+  
+  export mission save(filename: Str) → Void
+  export mission show() → Void
+}

@@ -1,0 +1,27 @@
+-- cosmos.stats — Statistical analysis constellation
+-- Unit-aware correlation, regression, distributions
+-- All return types are dimensionless (Float[1]) unless noted
+
+constellation cosmos.stats {
+  export mission pearson(x: Array[Float], y: Array[Float]) → Float[1]
+  export mission spearman(x: Array[Float], y: Array[Float]) → Float[1]
+
+  export mission linear_fit(x: Array[Float], y: Array[Float]) 
+    → (slope: Float[1], intercept: Float[1])
+
+  export mission polyfit(x: Array[Float], y: Array[Float], degree: Int)
+    → Array[Float[1]]
+
+  export mission mean(x: Array[Float]) → Float[1]
+  export mission median(x: Array[Float]) → Float[1]
+  export mission std(x: Array[Float]) → Float[1]
+  export mission variance(x: Array[Float]) → Float[1]
+
+  export mission quantile(x: Array[Float], q: Float[1]) → Float[1]
+
+  export mission min(x: Array[Float]) → Float[1]
+  export mission max(x: Array[Float]) → Float[1]
+  
+  export mission sum(x: Array[Float]) → Float[1]
+  export mission product(x: Array[Float]) → Float[1]
+}

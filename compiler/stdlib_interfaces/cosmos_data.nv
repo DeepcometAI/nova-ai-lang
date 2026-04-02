@@ -1,0 +1,25 @@
+-- cosmos.data — Data loading and I/O constellation
+-- Handles CSV, FITS, Parquet, Arrow formats
+-- Wave type for lazy streaming
+
+constellation cosmos.data {
+  export mission read_csv(path: Str) → Wave[Str]
+  
+  export mission read_fits(path: Str) → Wave[Str]
+  
+  export mission read_parquet(path: Str) → Wave[Str]
+  
+  export mission read_arrow(path: Str) → Wave[Str]
+
+  export mission write_csv(data: Array[Str], path: Str) → Void
+  
+  export mission write_parquet(data: Array[Str], path: Str) → Void
+
+  export mission filter(predicate: mission(Str) → Bool) → mission(Wave[Str]) → Wave[Str]
+  
+  export mission map(transform: mission(Str) → Str) → mission(Wave[Str]) → Wave[Str]
+  
+  export mission collect(data: Wave[Str]) → Array[Str]
+
+  export mission batch(size: Int) → mission(Wave[Str]) → Wave[Array[Str]]
+}
