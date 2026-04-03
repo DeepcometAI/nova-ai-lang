@@ -1,0 +1,12 @@
+-- cosmos.signal — FFT, filtering, windowing, power spectra
+
+
+constellation cosmos.signal {
+  export mission fft(x: Array[Float[1]]) → Array[Float[1]]
+  export mission ifft(x: Array[Float[1]]) → Array[Float[1]]
+  export mission power_spectrum(x: Array[Float[1]], sample_rate_hz: Float[Hz]) → (Array[Float[Hz]], Array[Float[1]])
+  export mission convolve(x: Array[Float[1]], kernel: Array[Float[1]]) → Array[Float[1]]
+  export mission lowpass_filter(x: Array[Float[1]], cutoff_hz: Float[Hz], sample_rate_hz: Float[Hz]) → Array[Float[1]]
+  export mission rms(x: Array[Float[1]]) → Float[1]
+  export mission snr_db(signal: Array[Float[1]], noise: Array[Float[1]]) → Float[1]
+}

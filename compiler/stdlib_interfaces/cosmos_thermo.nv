@@ -1,0 +1,10 @@
+-- cosmos.thermo — Ideal gas law, heat transfer, thermodynamic cycles
+
+
+constellation cosmos.thermo {
+  export mission ideal_gas_pressure(n_mol: Float[mol], temp_k: Float[K], volume_m3: Float[m^3]) → Float[Pa]
+  export mission ideal_gas_temperature(pressure_pa: Float[Pa], volume_m3: Float[m^3], n_mol: Float[mol]) → Float[K]
+  export mission carnot_efficiency(t_hot_k: Float[K], t_cold_k: Float[K]) → Float[1]
+  export mission celsius_to_kelvin(c: Float[1]) → Float[K]
+  export mission rms_speed(molar_mass_kg_mol: Float[kg/mol], temp_k: Float[K]) → Float[m/s]
+}

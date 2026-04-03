@@ -1,0 +1,8 @@
+-- nova.concurrent — Thread-safe channels, worker pools, atomic counters
+
+
+constellation nova.concurrent {
+  export mission channel(maxsize: Int) → Channel[T]
+  export mission spawn(fn: mission() -> Void) → Void
+  export mission parallel_map(fn: mission(T) -> R, items: Array[T], num_workers: Int) → Array[R]
+}

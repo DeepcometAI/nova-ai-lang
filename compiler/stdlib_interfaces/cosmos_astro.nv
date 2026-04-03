@@ -1,0 +1,12 @@
+-- cosmos.astro — Astronomy helpers — distances, coordinates, spectral classification
+
+
+constellation cosmos.astro {
+  export mission parallax_distance_pc(parallax_arcsec: Float[1]) → Float[pc]
+  export mission angular_separation_deg(ra1: Float[1], dec1: Float[1], ra2: Float[1], dec2: Float[1]) → Float[1]
+  export mission bv_to_temperature_k(bv_color: Float[1]) → Float[K]
+  export mission wien_displacement(temp_k: Float[K]) → Float[m]
+  export mission stefan_boltzmann_luminosity(radius_m: Float[m], temp_k: Float[K]) → Float[W]
+  export mission hubble_distance_mpc(recession_velocity_km_s: Float[km/s], h0_km_s_mpc: Float[km/s/Mpc]) → Float[Mpc]
+  export mission read_fits(path: Str) → Wave[Str]
+}

@@ -1,0 +1,11 @@
+-- cosmos.orbital — Orbital mechanics: Tsiolkovsky, Kepler, Hohmann, vis-viva
+
+
+constellation cosmos.orbital {
+  export mission delta_v(isp_s: Float[s], m_wet_kg: Float[kg], m_dry_kg: Float[kg]) → Float[m/s]
+  export mission kepler_period(a_m: Float[m], m_central_kg: Float[kg]) → Float[s]
+  export mission hohmann_delta_v(r1_m: Float[m], r2_m: Float[m], mu_m3_s2: Float[m^3/s^2]) → (Float[m/s], Float[m/s], Float[m/s])
+  export mission escape_velocity(r_m: Float[m], m_central_kg: Float[kg]) → Float[m/s]
+  export mission circular_velocity(r_m: Float[m], m_central_kg: Float[kg]) → Float[m/s]
+  export mission sphere_of_influence_m(a_m: Float[m], m_body_kg: Float[kg], m_central_kg: Float[kg]) → Float[m]
+}

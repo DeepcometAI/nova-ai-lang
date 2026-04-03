@@ -1,0 +1,11 @@
+-- cosmos.quantum — Quantum states, gates, measurement, and atomic physics
+
+
+constellation cosmos.quantum {
+  export mission pauli_x() → Tensor[Float[1], 2]
+  export mission hadamard() → Tensor[Float[1], 2]
+  export mission apply_gate(gate: Tensor[Float[1], _], state: Tensor[Float[1], _]) → Tensor[Float[1], _]
+  export mission measure(state: Tensor[Float[1], _]) → (Int, Tensor[Float[1], _])
+  export mission hydrogen_energy_ev(n: Int) → Float[eV]
+  export mission de_broglie_wavelength(mass_kg: Float[kg], velocity_m_s: Float[m/s]) → Float[m]
+}

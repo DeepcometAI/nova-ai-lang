@@ -1,0 +1,8 @@
+-- cosmos.geo — Geospatial: great-circle distances, coordinate transforms
+
+
+constellation cosmos.geo {
+  export mission great_circle_distance_m(lat1: Float[1], lon1: Float[1], lat2: Float[1], lon2: Float[1]) → Float[m]
+  export mission bearing_deg(lat1: Float[1], lon1: Float[1], lat2: Float[1], lon2: Float[1]) → Float[1]
+  export mission geodetic_to_ecef(lat_deg: Float[1], lon_deg: Float[1], alt_m: Float[m]) → (Float[m], Float[m], Float[m])
+}

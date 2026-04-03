@@ -1,0 +1,11 @@
+-- nova.test — Testing utilities: assertions, test suites, benchmarks
+
+
+constellation nova.test {
+  export mission assert_eq(actual: T, expected: T) → Void
+  export mission assert_approx(actual: Float[1], expected: Float[1], tolerance: Float[1]) → Void
+  export mission assert_raises(exc: Type, fn: mission() -> Void) → Void
+  export mission assert_true(value: Bool) → Void
+  export mission bench(fn: mission() -> Void, n: Int) → Float[1]
+  export mission run_tests(module: Str) → Bool
+}

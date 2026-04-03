@@ -1,0 +1,8 @@
+-- nova.net — HTTP server/client, route matching, Request and Response types
+
+
+constellation nova.net {
+  export mission serve(port: Int, routes: Array[Route]) → Void
+  export mission http_get(url: Str) → Str
+  export mission http_post(url: Str, body: Str) → Str
+}

@@ -1,0 +1,12 @@
+-- nova.crypto — Hashing, HMAC, random tokens, base64
+
+
+constellation nova.crypto {
+  export mission sha256(data: Str) → Str
+  export mission hmac_sha256(key: Str, data: Str) → Str
+  export mission random_bytes(n: Int) → Str
+  export mission random_token(n_bytes: Int) → Str
+  export mission uuid4() → Str
+  export mission base64_encode(data: Str) → Str
+  export mission pbkdf2(password: Str, salt: Str, iterations: Int) → Str
+}

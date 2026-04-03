@@ -1,0 +1,11 @@
+-- cosmos.chem — Periodic table, stoichiometry, and reaction energy
+
+
+constellation cosmos.chem {
+  export mission element_symbol(z: Int) → Str
+  export mission atomic_mass_u(z: Int) → Float[u]
+  export mission molar_mass(z: Int) → Float[g/mol]
+  export mission moles_from_grams(mass_g: Float[g], z: Int) → Float[mol]
+  export mission arrhenius_rate(a_pre: Float[1], ea_j_mol: Float[J/mol], temp_k: Float[K]) → Float[1]
+  export mission energy_to_wavelength_m(energy_j: Float[J]) → Float[m]
+}

@@ -1,0 +1,11 @@
+-- cosmos.spectral — Blackbody radiation, Doppler shifts, emission lines, redshift
+
+
+constellation cosmos.spectral {
+  export mission blackbody_peak_wavelength(temp_k: Float[K]) → Float[m]
+  export mission blackbody_spectral_radiance(wavelength_m: Float[m], temp_k: Float[K]) → Float[W/m^3/sr]
+  export mission doppler_shift_wavelength(rest_wavelength_m: Float[m], radial_velocity_m_s: Float[m/s]) → Float[m]
+  export mission redshift_from_velocity(radial_velocity_m_s: Float[m/s]) → Float[1]
+  export mission velocity_from_redshift(z: Float[1]) → Float[m/s]
+  export mission luminosity_distance_mpc(z: Float[1], h0_km_s_mpc: Float[km/s/Mpc]) → Float[Mpc]
+}

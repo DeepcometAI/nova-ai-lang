@@ -1,0 +1,11 @@
+-- nova.db — SQLite wrapper — connect, execute, query, insert, transaction
+
+
+constellation nova.db {
+  export mission connect(path: Str) → Database
+  export mission execute(conn: Database, sql: Str) → Void
+  export mission query_all(conn: Database, sql: Str) → Array[Struct]
+  export mission query_one(conn: Database, sql: Str) → Option[Struct]
+  export mission insert(conn: Database, table: Str, row: Struct) → Int
+  export mission table_exists(conn: Database, table: Str) → Bool
+}

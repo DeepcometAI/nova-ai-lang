@@ -1,0 +1,11 @@
+-- nova.fmt — JSON, YAML, TOML serialization and deserialization
+
+
+constellation nova.fmt {
+  export mission json_dump(obj: Str) → Str
+  export mission json_load(data: Str) → Str
+  export mission yaml_dump(obj: Str) → Str
+  export mission yaml_load(data: Str) → Str
+  export mission toml_dump(obj: Str) → Str
+  export mission toml_load(data: Str) → Str
+}
